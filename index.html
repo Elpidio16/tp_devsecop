@@ -1,22 +1,18 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>Test SQL Injection</title>
 </head>
 <body>
-    <h1>Bienvenue sur test-gema.local afin de tester les injections SQL</hjson>
-    <form method="post" action="/search">
-        <label for="search">Rechercher :</label>
-        <!-- Correction de la vulnérabilité avec validation -->
-        <input 
-            type="text" 
-            id="search" 
-            name="search" 
-            oninput="this.value = this.value.replace(/[';--]/g, '')" 
-            required 
-            placeholder="Rechercher quelque chose..."
-        >
-        <button type="submit">Envoyer</button>
-    </form>
+    <h1>Bienvenue sur test-gema.local Elpidio lesage</h1>
+    <form method="post" action="/search"> 
+        <label for="search">Rechercher :</label> 
+        <input type="text" id="search" name="search"> 
+        <button type="submit">Envoyer</button> 
+    </form> 
 </body>
+<!-- Ce formulaire est vulnérable aux injections SQL car il n'utilise pas d'échappement des entrées utilisateur -->
 </html>
