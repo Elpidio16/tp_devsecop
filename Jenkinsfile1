@@ -1,34 +1,72 @@
 pipeline {
-    agent none
+    agent any
+
+    environment {
+        // Nom de l'environnement SonarQube défini dans Jenkins
+        SONARQUBE_ENV = 'sonarqube_scanner'
+        // Nom du profil Maven si nécessaire
+        MAVEN_PROFILE = 'sonar'
+    }
+
     stages {
-        
-        stage('build & sonarqube_scanner') {
-            agent any
+        stage('Checkout Code') {
+            steps {
+                // Récupérer le code source
+                checkout scm
+            }
+        }
+
+        stage('Build Project') {
             steps {
                 script {
                     try {
-                        // Start SonarQube scanning with Maven
-                        withSonarQubeEnv('sonarqube_scanner') {
-                            sh 'mvn clean package sonar:sonar'
-                        }
+                        // Construire le projet Maven
+                        sh 'mvn clean package'
                     } catch (Exception e) {
-                        // Catch any error in the build or SonarQube scanning process
-                        currentBuild.result = 'FAILURE'  // Set the build result to failure
-                        error "Build or SonarQube scanning failed: ${e.message}"  // Display error message
+                        currentBuild.result = 'FAILURE'
+                        error "Échec de la compilation Maven : ${e.message}"
                     }
                 }
             }
-            post {
-                failure {
-                    // Handle post-failure actions (like notifications)
-                    echo "Build failed during SonarQube scan"
-                    // Add other actions like sending a failure notification if necessary
-                }
-                success {
-                    // Actions to take on success (optional)
-                    echo "Build completed successfully"
+        }
+
+        stage('SonarQube Analysis') {
+            steps {
+                script {
+                    try {
+                        // Lancer l'analyse SonarQube avec le plugin Maven
+                        withSonarQubeEnv("${SONARQUBE_ENV}") {
+                            sh "mvn sonar:sonar -P${MAVEN_PROFILE}"
+                        }
+                    } catch (Exception e) {
+                        currentBuild.result = 'FAILURE'
+                        error "Échec de l'analyse SonarQube : ${e.message}"
+                    }
                 }
             }
+        }
+
+        stage('Quality Gate') {
+            steps {
+                script {
+                    // Vérifier que le Quality Gate SonarQube est passé
+                    timeout(time: 2, unit: 'MINUTES') {
+                        waitForQualityGate abortPipeline: true
+                    }
+                }
+            }
+        }
+    }
+
+    post {
+        always {
+            echo "Pipeline terminé."
+        }
+        success {
+            echo "Pipeline exécuté avec succès."
+        }
+        failure {
+            echo "Le pipeline a échoué."
         }
     }
 }
