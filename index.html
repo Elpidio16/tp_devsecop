@@ -3,17 +3,42 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, 
-initial-scale=1.0">
-<script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
-    <title>OWASP Dependency-Check Demo test</title>
-    <!-- Inclusion d'une bibliothèque JavaScript vulnérable -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.7.2/jquery.min. js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SonarQube Error Demo</title>
+
+    <!-- Utilisation d'une bibliothèque JavaScript vulnérable -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+
+    <!-- Inclusion d'une feuille de style inline non sécurisée -->
+    <style>
+        body {
+            background-image: url('javascript:alert("XSS!")'); /* Vulnérabilité XSS */
+        }
+    </style>
 </head>
 
 <body>
-    <h1>Test OWASP Dependency-Check</h1>
-    <p>Ceci est une page de démonstration avec une bibliothèque vulnérable.</p>
+    <h1>Page avec des erreurs pour SonarQube</h1>
+
+    <!-- Utilisation d'un attribut onClick vulnérable -->
+    <button onclick="alert(document.cookie)">Afficher les cookies</button> <!-- Vulnérabilité XSS -->
+
+    <!-- Mauvaise gestion des entrées utilisateur -->
+    <form method="post" action="/submit">
+        <label for="username">Nom d'utilisateur :</label>
+        <input type="text" id="username" name="username" value="<%= request.getParameter('username') %>"> <!-- Injection XSS -->
+        <button type="submit">Envoyer</button>
+    </form>
+
+    <!-- Utilisation d'une image avec une source externe potentiellement dangereuse -->
+    <img src="http://example.com/evil-image.jpg" alt="Image non sécurisée">
+
+    <!-- Non-respect des bonnes pratiques pour le CSP (Content Security Policy) -->
+    <meta http-equiv="Content-Security-Policy" content="default-src * 'unsafe-inline' 'unsafe-eval';">
+
+    <!-- Inclusion d'un iframe externe sans sandbox -->
+    <iframe src="http://example.com" width="600" height="400"></iframe>
+
 </body>
 
 </html>
