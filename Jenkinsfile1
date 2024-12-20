@@ -1,16 +1,34 @@
 pipeline {
-        agent none
-        stages {
-         
-          stage("build & sonarqube_scanner") {
+    agent none
+    stages {
+        
+        stage('build & sonarqube_scanner') {
             agent any
             steps {
-              withSonarQubeEnv('sonarqube_scanner') {
-                sh 'mvn clean package sonar:sonar'
-              }
+                script {
+                    try {
+                        // Start SonarQube scanning with Maven
+                        withSonarQubeEnv('sonarqube_scanner') {
+                            sh 'mvn clean package sonar:sonar'
+                        }
+                    } catch (Exception e) {
+                        // Catch any error in the build or SonarQube scanning process
+                        currentBuild.result = 'FAILURE'  // Set the build result to failure
+                        error "Build or SonarQube scanning failed: ${e.message}"  // Display error message
+                    }
+                }
             }
-          }
+            post {
+                failure {
+                    // Handle post-failure actions (like notifications)
+                    echo "Build failed during SonarQube scan"
+                    // Add other actions like sending a failure notification if necessary
+                }
+                success {
+                    // Actions to take on success (optional)
+                    echo "Build completed successfully"
+                }
+            }
         }
-      }
-
-
+    }
+}
