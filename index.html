@@ -10,7 +10,6 @@
     <form method="post" action="/search">
         <label for="search">Rechercher :</label>
         <input type="text" id="search" name="search">
-       <!--  <input type="text" id="search" name="search" oninput="this.value = this.value.replace(/[';--]/g, '')">  -->
         <button type="submit">Envoyer</button>
     </form>
     <!-- Ce formulaire est vulnérable aux injections SQL car il n'utilise pas d'échappement des entrées utilisateur -->
