@@ -1,0 +1,19 @@
+pipeline {
+
+    agent { étiquette 'linux' }
+
+    options {
+
+        buildDiscarder (logRotator(numToKeepStr: 5'))
+        
+    }
+    stages {
+        stage('Scan') {
+            steps {
+                withSonarQubeEnv(installationName: 'sql1') {
+                   sh'/mvnw clean org.sonarsource.sganner.maven:sonar-maven-plug in:3.9.0.2155:sonar'
+                }
+            }
+        }
+    }
+} 
